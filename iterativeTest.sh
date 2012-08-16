@@ -1,10 +1,11 @@
 #!/bin/bash
-#echo "Testing SqrtBench with multiple lengths" > test.txt
+# How to use this:
+# iterativeTest.sh <Parallel class-file> <Sequential class-file> <File to write in>
 
 i=1
 while [ $i -le 10 ]
 do
 	#echo `expr $i \* 5000` >> test.txt
-	./test.sh `expr $i \* 1000` isPrimBench isPrimBenchSeq >> isPrim.txt
+	./test.sh `expr $i \* 1000` $1 $2 >> $3
 	i=`expr $i + 1`
 done
