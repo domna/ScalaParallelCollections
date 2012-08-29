@@ -5,12 +5,12 @@ import scala.collection.parallel.mutable.ParTrieMap
 import scala.collection.concurrent.TrieMap
 
 object isPrimBench extends testing.Benchmark{
-		val len = sys.props("length").toInt
-		val parLvl = sys.props("par").toInt
+	val len = sys.props("length").toInt
+	val parLvl = sys.props("par").toInt
 
-		val testing = ParSeq((0 until len): _*)
-		testing.tasksupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(parLvl))
-		var prims = ParSeq[Int]()
+	val testing = ParSeq((0 until len): _*)
+	testing.tasksupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(parLvl))
+	var prims = ParSeq[Int]()
 
 	def run{
 		prims = testing filter { n =>
