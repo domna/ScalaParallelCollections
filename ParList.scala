@@ -55,7 +55,7 @@ class ParList[T](elems:T*) extends ParSeq[T] with GenericParTemplate[T,ParList] 
 	
 
 	def splitter = new ParListSplitter(0,length)
-	def seq = {
+    def seq = {
 		var ret = List[T]()
 		for(i <- iterator) ret :+= i
 		ret
@@ -71,7 +71,6 @@ class ParList[T](elems:T*) extends ParSeq[T] with GenericParTemplate[T,ParList] 
 	}
 
 	def length:Int = {
-		if(root.next == null) return 0
 		var loc = root.next
 		var i = 0
 		while(loc != root){
