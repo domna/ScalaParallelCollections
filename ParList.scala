@@ -52,10 +52,30 @@ class ParList[T](elems:T*) extends ParSeq[T] with GenericParTemplate[T,ParList] 
 		}
 	}
 
-	
+	class ParListCombiner[T] extends Combiner[T,ParList[T]]{
+		var sz = 0
+		var res = new ParList[T]()
+
+		def size = sz
+		def +=(elem:T):this.type = {
+			res.append(elem)
+			this
+		}
+		def clear:Unit = res = new ParList[T]()
+		def result:ParList[T] = res 
+		def combine[U <: T, NewTo >: ParList[T]](other: Combiner[U,NewTo]):Combiner[U,NewTo] = {  
+			if(other eq this) this
+			else {
+				val that = other.asInstanceOf[ParListCombiner[T]]
+				sz += that.sz
+				for(i <- that.res) this += i
+				this
+			}
+		}
+	}
 
 	def splitter = new ParListSplitter(0,length)
-	def seq = {
+    def seq = {
 		var ret = List[T]()
 		for(i <- iterator) ret :+= i
 		ret
@@ -64,7 +84,7 @@ class ParList[T](elems:T*) extends ParSeq[T] with GenericParTemplate[T,ParList] 
 	protected[this] override def newCombiner:Combiner[T,ParList[T]] = new ParListCombiner
 	override def companion:GenericCompanion[ParList] with GenericParCompanion[ParList]  = ParList
 
-	def append(e:T){
+	private def append(e:T){
 		val last = root.prev
 		root.prev = new ParListElem(root,last,e)
 		last.next = root.prev
@@ -91,28 +111,6 @@ class ParList[T](elems:T*) extends ParSeq[T] with GenericParTemplate[T,ParList] 
 	}
 }
 
-
-class ParListCombiner[T] extends Combiner[T,ParList[T]]{
-		var sz = 0
-		var res = new ParList[T]()
-
-		def size = sz
-		def +=(elem:T):this.type = {
-			res.append(elem)
-			this
-		}
-		def clear:Unit = res = new ParList[T]()
-		def result:ParList[T] = res 
-		def combine[U <: T, NewTo >: ParList[T]](other: Combiner[U,NewTo]):Combiner[U,NewTo] = {  
-			if(other eq this) this
-			else {
-				val that = other.asInstanceOf[ParListCombiner[T]]
-				sz += that.sz
-				for(i <- that.res) this += i
-				this
-			}
-		}
-}
 
 object ParList extends ParFactory[ParList]{
 	implicit def canBuildFrom[T]: CanCombineFrom[ParList[T],T,ParList[T]] = 
